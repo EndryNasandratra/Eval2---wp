@@ -54,9 +54,36 @@ const TABLE_DEFINITIONS = {
       cout REAL NOT NULL,
       id_item INTEGER,
       id_category TEXT,
-      group_id TEXT
+      group_id TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      percentage REAL,
+      calculation_mode INTEGER,
+      base_cost REAL
     )
   `
+};
+
+const migrateTicketCosts = () => {
+  const columns = db.prepare('PRAGMA table_info(ticket_costs)').all();
+  const names = new Set(columns.map(column => column.name));
+  const migrations = [
+    ['created_at', 'ALTER TABLE ticket_costs ADD COLUMN created_at TEXT'],
+    ['percentage', 'ALTER TABLE ticket_costs ADD COLUMN percentage REAL'],
+    ['calculation_mode', 'ALTER TABLE ticket_costs ADD COLUMN calculation_mode INTEGER'],
+    ['base_cost', 'ALTER TABLE ticket_costs ADD COLUMN base_cost REAL'],
+  ];
+
+  for (const [name, sql] of migrations) {
+    if (!names.has(name)) {
+      db.exec(sql);
+    }
+  }
+
+  db.exec(`
+    UPDATE ticket_costs
+    SET created_at = COALESCE(created_at, datetime('now'))
+    WHERE created_at IS NULL
+  `);
 };
 
 const dropTables = () => {
@@ -111,6 +138,7 @@ const initDatabase = ({ reset = false } = {}) => {
   }
 
   createTables();
+  migrateTicketCosts();
   seedDefaults();
 
   console.log(reset

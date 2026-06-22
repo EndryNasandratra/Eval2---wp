@@ -56,6 +56,7 @@ import TicketUpdate from '../pages/frontoffice/TicketUpdate';
 import FrontOfficeTicketDetail from '../pages/frontoffice/TicketDetail';
 import AdminSettings from '../pages/backoffice/AdminSettings/AdminSettings';
 import TicketCostRepartition from '../pages/backoffice/TicketCostRepartition';
+import CostOperations from '../pages/backoffice/CostOperations';
 
 const AppRouter = () => {
   return (
@@ -125,6 +126,7 @@ const AppRouter = () => {
             <Route path="/tickets" element={<TicketList />} />
             <Route path="/tickets/:id" element={<TicketDetail />} />
             <Route path="/tickets/costs" element={<TicketCostRepartition />} />
+            <Route path="/tickets/cost-operations" element={<CostOperations />} />
             <Route path="/import" element={<GLPIImportPage />} />
             <Route path="/import-mouvement" element={<MouvementImportPage />} />
             <Route path="/import-simple" element={<MouvementImportPage />} />

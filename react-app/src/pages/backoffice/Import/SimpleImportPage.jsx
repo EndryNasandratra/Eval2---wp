@@ -170,10 +170,14 @@ const mouvementImportPage = () => {
               if (linkedItems && linkedItems.length > 0) {
                 const dividedCost = calculatedCost / linkedItems.length;
                 for (const item of linkedItems) {
-                  await TicketCostService.saveCustomReopenCost(ticketId, dividedCost, item.items_id, item.itemtype, groupId);
+                  await TicketCostService.saveCustomReopenCost(
+                    ticketId, dividedCost, item.items_id, item.itemtype, groupId, value, mode, baseCost
+                  );
                 }
               } else {
-                await TicketCostService.saveCustomReopenCost(ticketId, calculatedCost, null, null, groupId);
+                await TicketCostService.saveCustomReopenCost(
+                  ticketId, calculatedCost, null, null, groupId, value, mode, baseCost
+                );
               }
 
               await TicketService.updateTicket(ticketId, { status: 2 });

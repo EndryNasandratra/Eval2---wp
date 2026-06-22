@@ -32,10 +32,14 @@ const MouvementImportService = {
     if (linkedItems && linkedItems.length > 0) {
       const dividedCost = calculatedCost / linkedItems.length;
       for (const item of linkedItems) {
-        await TicketCostService.saveCustomReopenCost(ticketId, dividedCost, item.items_id, item.itemtype, groupId);
+        await TicketCostService.saveCustomReopenCost(
+          ticketId, dividedCost, item.items_id, item.itemtype, groupId, percentage, mode, baseCost
+        );
       }
     } else {
-      await TicketCostService.saveCustomReopenCost(ticketId, calculatedCost, null, null, groupId);
+      await TicketCostService.saveCustomReopenCost(
+        ticketId, calculatedCost, null, null, groupId, percentage, mode, baseCost
+      );
     }
 
     await TicketService.updateTicket(ticketId, { status: 2 });
@@ -51,17 +55,6 @@ const MouvementImportService = {
     const linkedItems = await ItemTicketService.getItemsForTicket(ticketId).catch(() => []);
     const groupId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-    if (closeValue !== null && !Number.isNaN(closeValue) && closeValue >= 0) {
-      if (linkedItems && linkedItems.length > 0) {
-        const dividedCost = closeValue / linkedItems.length;
-        for (const item of linkedItems) {
-          await TicketCostService.saveSuperCost(ticketId, dividedCost, item.items_id, item.itemtype, groupId);
-        }
-      } else {
-        await TicketCostService.saveSuperCost(ticketId, closeValue, null, null, groupId);
-      }
-    }
-
     const currentTicket = await TicketService.getTicket(ticketId).catch(() => null);
     const currentContent = currentTicket?.content || '';
     const formattedDate = new Date().toLocaleDateString('fr-FR');
@@ -73,6 +66,17 @@ const MouvementImportService = {
       closedate: new Date().toISOString(),
       content: currentContent + closingNote,
     });
+
+    if (closeValue !== null && !Number.isNaN(closeValue) && closeValue >= 0) {
+      if (linkedItems && linkedItems.length > 0) {
+        const dividedCost = closeValue / linkedItems.length;
+        for (const item of linkedItems) {
+          await TicketCostService.saveSuperCost(ticketId, dividedCost, item.items_id, item.itemtype, groupId);
+        }
+      } else {
+        await TicketCostService.saveSuperCost(ticketId, closeValue, null, null, groupId);
+      }
+    }
 
     return {
       message: 'Ticket clôturé avec succès.',

@@ -118,30 +118,18 @@ const TicketCostService = {
   },
 
   deleteSuperCost: async (ticket_id) => {
-    try {
-      const response = await axios.delete(`${TICKETCOST_API_URL}/${ticket_id}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.delete(`${TICKETCOST_API_URL}/${ticket_id}`);
+    return response.data;
   },
 
   saveReopenCost: async (ticket_id, percentage, id_item = null, id_category = null, group_id = null) => {
-    try {
-      const response = await axios.post(`${TICKETCOST_API_URL}/reopen`, { ticket_id, percentage, id_item, id_category, group_id });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.post(`${TICKETCOST_API_URL}/reopen`, { ticket_id, percentage, id_item, id_category, group_id });
+    return response.data;
   },
 
   getAllReopenCosts: async () => {
-    try {
-      const response = await axios.get(`${TICKETCOST_API_URL}/reopen/all`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.get(`${TICKETCOST_API_URL}/reopen/all`);
+    return response.data;
   },
 
   calculateBaseCost: async (ticket_id, mode) => {
@@ -154,14 +142,45 @@ const TicketCostService = {
     }
   },
 
-  saveCustomReopenCost: async (ticket_id, calculated_cost, id_item = null, id_category = null, group_id = null) => {
+  saveCustomReopenCost: async (
+    ticket_id,
+    calculated_cost,
+    id_item = null,
+    id_category = null,
+    group_id = null,
+    percentage = null,
+    mode = null,
+    base_cost = null
+  ) => {
     try {
-      const response = await axios.post(`${TICKETCOST_API_URL}/reopen-custom`, { ticket_id, calculated_cost, id_item, id_category, group_id });
+      const response = await axios.post(`${TICKETCOST_API_URL}/reopen-custom`, {
+        ticket_id,
+        calculated_cost,
+        id_item,
+        id_category,
+        group_id,
+        percentage,
+        mode,
+        base_cost
+      });
       return response.data;
     } catch (error) {
       console.error('Error saving custom reopen cost:', error);
       throw error;
     }
+  },
+
+  getCostOperations: async () => {
+    const response = await axios.get(`${TICKETCOST_API_URL}/operations/all`);
+    return response.data || [];
+  },
+
+  updateCostOperation: async (operationKey, payload) => {
+    const response = await axios.put(
+      `${TICKETCOST_API_URL}/operations/${encodeURIComponent(operationKey)}`,
+      payload
+    );
+    return response.data;
   }
 };
 

@@ -25,6 +25,7 @@ const MENU_ITEMS = [
     submenu: [
       { label: 'Tickets', path: '/tickets' },
       { label: 'Répartition des coûts', path: '/tickets/costs' },
+      { label: 'RÃ©ouvertures et supercosts', path: '/tickets/cost-operations' },
       { label: 'Configuration Kanban', path: '/admin' }
     ]
   },

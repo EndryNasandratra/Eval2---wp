@@ -1,6 +1,45 @@
 import api, { initSession } from '../../config/api';
 import ItemTicketService from '../ItemTicket/ItemTicketService';
 
+const GLPI_DATE_FIELDS = new Set([
+  'date',
+  'date_creation',
+  'date_mod',
+  'solvedate',
+  'closedate',
+  'begin_date',
+  'end_date',
+]);
+
+const padDatePart = (value) => String(value).padStart(2, '0');
+
+export const formatDateForGlpi = (value) => {
+  if (value === null || value === undefined || value === '') return value;
+
+  const text = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(text)) return text;
+
+  const date = value instanceof Date ? value : new Date(text);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return [
+    date.getFullYear(),
+    padDatePart(date.getMonth() + 1),
+    padDatePart(date.getDate()),
+  ].join('-') + ' ' + [
+    padDatePart(date.getHours()),
+    padDatePart(date.getMinutes()),
+    padDatePart(date.getSeconds()),
+  ].join(':');
+};
+
+const normalizeTicketDates = (ticketData) => Object.fromEntries(
+  Object.entries(ticketData).map(([key, value]) => [
+    key,
+    GLPI_DATE_FIELDS.has(key) ? formatDateForGlpi(value) : value,
+  ])
+);
+
 // Helper to extract count from Content-Range header
 const extractCountFromResponse = (response) => {
   let total = 0;
@@ -115,7 +154,7 @@ const TicketService = {
     try {
       await initSession();
       // ticketData peut contenir : name (Titre), content (Description), date, type, status, priority, etc.
-      const response = await api.post('/Ticket', { input: ticketData });
+      const response = await api.post('/Ticket', { input: normalizeTicketDates(ticketData) });
       return response.data;
     } catch (error) {
       console.error('Error creating ticket:', error);
@@ -127,7 +166,7 @@ const TicketService = {
   updateTicket: async (id, ticketData) => {
     try {
       await initSession();
-      const response = await api.put(`/Ticket/${id}`, { input: ticketData });
+      const response = await api.put(`/Ticket/${id}`, { input: normalizeTicketDates(ticketData) });
       return response.data;
     } catch (error) {
       console.error(`Error updating ticket ${id}:`, error);

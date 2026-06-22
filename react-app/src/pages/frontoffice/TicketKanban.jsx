@@ -430,10 +430,16 @@ const TicketKanban = () => {
         if (linkedItems && linkedItems.length > 0) {
           const dividedCost = calculatedCost / linkedItems.length;
           for (const item of linkedItems) {
-            await TicketCostService.saveCustomReopenCost(ticketId, dividedCost, item.items_id, item.itemtype, groupId);
+            await TicketCostService.saveCustomReopenCost(
+              ticketId, dividedCost, item.items_id, item.itemtype, groupId,
+              parseFloat(percentage), modeInt, baseCost
+            );
           }
         } else {
-          await TicketCostService.saveCustomReopenCost(ticketId, calculatedCost, null, null, groupId);
+          await TicketCostService.saveCustomReopenCost(
+            ticketId, calculatedCost, null, null, groupId,
+            parseFloat(percentage), modeInt, baseCost
+          );
         }
       }
       setReopenModalData(prev => ({ ...prev, isOpen: false }));
